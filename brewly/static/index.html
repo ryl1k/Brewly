@@ -147,7 +147,7 @@ $("skip").onclick = async () => { const { ok, j } = await post(`/api/customers/$
 $("signup").onclick = async () => { const { ok, j } = await post("/api/signup", { name: $("su-name").value, email: $("su-email").value }); note("su-msg", ok, ok ? `Account created for ${j.email}` : j.detail); };
 document.querySelectorAll(".who button").forEach((b) => b.onclick = () => {
   document.querySelectorAll(".who button").forEach((x) => x.classList.remove("on")); b.classList.add("on");
-  customer = b.dataset.c; session = Math.random().toString(36).slice(2); $("log").innerHTML = ""; greet(); loadSub();
+  customer = b.dataset.c; session = Math.random().toString(36).slice(2); $("log").innerHTML = ""; $("chips").style.display = ""; greet(); loadSub();
 });
 
 function bubble(kind, text, extra) {
@@ -174,7 +174,7 @@ function bubble(kind, text, extra) {
 function greet() { bubble("bot", "Hi! I'm Brewly Bot. I can help with plans and shipping, and I'll bring in our support team for anything else."); }
 async function send(text) {
   if (!text.trim()) return;
-  bubble("me", text); $("text").value = "";
+  bubble("me", text); $("text").value = ""; $("chips").style.display = "none";
   const t = document.createElement("div"); t.className = "typing"; t.innerHTML = '<span class="dot"></span><span id="phase">Brewly Bot is typing…</span>';
   $("log").appendChild(t); $("log").scrollTop = 1e9;
   let i = 0; const timer = setTimeout(function tick() { const p = document.getElementById("phase"); if (p) p.textContent = PHASES[Math.min(i++, PHASES.length - 1)]; window._t = setTimeout(tick, 2600); }, 700);
