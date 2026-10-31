@@ -115,7 +115,5 @@ def _relay(s: Session, result: dict) -> dict[str, Any]:
     s.ticket_id = result.get("ticket_id", s.ticket_id)
     s.status = result.get("status")
     s.pending_question = (result.get("needs_confirmation") or {}).get("question")
-    text = result.get("customer_reply") or "We're on it."
-    if s.pending_question:
-        text = f"{text}\n\n{s.pending_question}"
-    return _out(text, "supfeel", s, result)
+    # Supfeel's reply already asks for the OK; the widget adds Yes/No buttons when a question is pending.
+    return _out(result.get("customer_reply") or "We're on it.", "supfeel", s, result)
