@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Brewly · Fresh coffee, on your schedule</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fbf6ef; --ink: #2b1d14; --muted: #7a6656; --line: #eadccb; --card: #ffffff;
+    --brand: #6f3f1f; --brand-2: #a0612f; --cream: #f3e6d4; --ok: #2f7d4f; --bad: #b5402f; --supfeel: #4353f0;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+  a { color: var(--brand-2); }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 1px solid var(--line); background: #fffaf3; position: sticky; top: 0; z-index: 5; }
+  .logo { font-family: Fraunces, serif; font-size: 26px; font-weight: 700; color: var(--brand); display: flex; align-items: center; gap: 8px; }
+  .who { display: flex; gap: 8px; align-items: center; font-size: 14px; color: var(--muted); }
+  .who button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; cursor: pointer; font: inherit; }
+  .who button.on { background: var(--brand); color: #fff; border-color: var(--brand); }
+  main { max-width: 1080px; margin: 0 auto; padding: 32px; display: grid; gap: 24px; grid-template-columns: 1.2fr 1fr; }
+  .hero { grid-column: 1 / -1; background: linear-gradient(120deg, #3b2214, #6f3f1f 60%, #a0612f); color: #fff; border-radius: 24px; padding: 40px; }
+  .hero h1 { font-family: Fraunces, serif; font-size: 44px; margin: 0 0 8px; }
+  .hero p { margin: 0; opacity: .85; font-size: 17px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 24px; }
+  .card h2 { font-family: Fraunces, serif; margin: 0 0 14px; font-size: 22px; }
+  .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; grid-column: 1 / -1; }
+  .plan { background: var(--cream); border-radius: 16px; padding: 18px; }
+  .plan b { display: block; font-size: 16px; } .plan span { color: var(--muted); font-size: 14px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+  input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; font: inherit; background: #fff; }
+  .btn { background: var(--brand); color: #fff; border: 0; border-radius: 999px; padding: 11px 18px; font: inherit; font-weight: 600; cursor: pointer; margin-top: 14px; }
+  .btn.ghost { background: #fff; color: var(--brand); border: 1px solid var(--line); }
+  .msg { margin-top: 12px; font-size: 14px; padding: 10px 12px; border-radius: 12px; display: none; }
+  .msg.err { display: block; background: #fbe9e6; color: var(--bad); }
+  .msg.ok { display: block; background: #e8f4ec; color: var(--ok); }
+  .row { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
+  .row > * { flex: 1; }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 6px 12px; font-size: 15px; }
+  .kv span:nth-child(odd) { color: var(--muted); }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; background: #e8f4ec; color: var(--ok); }
+  .pill.paused { background: #fdf1dc; color: #9a6a12; }
+  /* chat widget */
+  #chat-btn { position: fixed; right: 24px; bottom: 24px; border: 0; background: var(--brand); color: #fff; border-radius: 999px; padding: 14px 20px; font: inherit; font-weight: 600; box-shadow: 0 12px 30px -10px rgba(60,30,10,.6); cursor: pointer; }
+  #chat { position: fixed; right: 24px; bottom: 24px; width: 400px; max-width: calc(100vw - 32px); height: 620px; max-height: calc(100vh - 48px); background: #fff; border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 30px 80px -30px rgba(60,30,10,.55); display: none; flex-direction: column; overflow: hidden; }
+  #chat.open { display: flex; animation: up .25s ease-out; }
+  @keyframes up { from { transform: translateY(12px); opacity: 0 } to { transform: none; opacity: 1 } }
+  .chat-head { background: var(--brand); color: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 10px; }
+  .chat-head b { font-size: 15px; } .chat-head small { display: block; opacity: .8; font-size: 12px; }
+  .chat-head button { margin-left: auto; background: transparent; border: 0; color: #fff; font-size: 20px; cursor: pointer; }
+  .log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: #fffaf3; }
+  .b { max-width: 85%; padding: 10px 13px; border-radius: 16px; font-size: 14.5px; line-height: 1.45; white-space: pre-wrap; animation: up .2s ease-out; }
+  .b.me { align-self: flex-end; background: var(--brand); color: #fff; border-bottom-right-radius: 4px; }
+  .b.bot { align-self: flex-start; background: #fff; border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+  .b.supfeel { align-self: flex-start; background: #fff; border: 1px solid #c9cdfb; border-bottom-left-radius: 4px; box-shadow: 0 6px 20px -14px var(--supfeel); }
+  .tag { display: flex; gap: 6px; align-items: center; font-size: 11.5px; font-weight: 600; color: var(--supfeel); margin-bottom: 4px; }
+  .tag a { color: var(--supfeel); font-weight: 500; text-decoration: none; border: 1px solid #c9cdfb; border-radius: 6px; padding: 0 5px; }
+  .eng { margin-top: 8px; font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 6px; }
+  .yn { display: flex; gap: 8px; margin-top: 8px; }
+  .yn button { border-radius: 999px; padding: 6px 14px; border: 1px solid var(--line); background: #fff; cursor: pointer; font: inherit; font-size: 13.5px; }
+  .yn button:first-child { background: var(--supfeel); color: #fff; border-color: var(--supfeel); }
+  .typing { align-self: flex-start; font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--supfeel); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: .3 } }
+  form.send { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); }
+  form.send input { border-radius: 999px; }
+  form.send button { border: 0; background: var(--brand); color: #fff; border-radius: 999px; padding: 0 16px; font: inherit; cursor: pointer; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 10px; background: #fffaf3; }
+  .chips button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 10px; font: inherit; font-size: 12.5px; cursor: pointer; color: var(--ink); }
+  @media (max-width: 820px) { main { grid-template-columns: 1fr; padding: 16px; } .plans { grid-template-columns: 1fr; } header { padding: 14px 16px; } .hero h1 { font-size: 32px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">☕ Brewly</div>
+  <div class="who">Signed in as
+    <button data-c="c_maya" class="on">Maya</button>
+    <button data-c="c_leo">Leo</button>
+  </div>
+</header>
+<main>
+  <section class="hero">
+    <h1>Fresh coffee, on your schedule.</h1>
+    <p>Roasted this week, shipped every two weeks. Pause or skip any time. Shipping is always free.</p>
+  </section>
+  <section class="plans">
+    <div class="plan"><b>House Blend</b><span>$18 per delivery · chocolate, caramel</span></div>
+    <div class="plan"><b>Espresso Roast</b><span>$22 per delivery · dark, syrupy</span></div>
+    <div class="plan"><b>Swiss Water Decaf</b><span>$17 per delivery · all flavor, no buzz</span></div>
+  </section>
+  <section class="card">
+    <h2>Your subscription</h2>
+    <div class="kv" id="sub"></div>
+    <div class="row">
+      <div><label for="weeks">Pause for</label>
+        <select id="weeks"><option value="1">1 week</option><option value="2">2 weeks</option><option value="4">4 weeks</option><option value="6">6 weeks</option><option value="8" selected>8 weeks</option></select></div>
+      <button class="btn" id="pause">Pause</button>
+      <button class="btn ghost" id="skip">Skip next delivery</button>
+    </div>
+    <div class="msg" id="sub-msg"></div>
+  </section>
+  <section class="card">
+    <h2>Gift a friend a subscription</h2>
+    <label for="su-name">Their name</label><input id="su-name" value="Maya Chen" />
+    <label for="su-email">Their email</label><input id="su-email" value="maya+coffee@gmail.com" />
+    <button class="btn" id="signup">Create account</button>
+    <div class="msg" id="su-msg"></div>
+  </section>
+</main>
+
+<button id="chat-btn">💬 Help</button>
+<div id="chat" role="dialog" aria-label="Brewly support">
+  <div class="chat-head"><div>☕</div><div><b>Brewly support</b><small>Brewly Bot · backed by Supfeel</small></div><button id="close" aria-label="Close">×</button></div>
+  <div class="log" id="log"></div>
+  <div class="chips" id="chips">
+    <button>How much are the plans?</button>
+    <button>I can't sign up, it says my email maya+coffee@gmail.com is invalid</button>
+    <button>Please skip my next delivery</button>
+    <button>Why was I charged before my coffee arrived?</button>
+  </div>
+  <form class="send" id="send"><input id="text" placeholder="Type a message…" autocomplete="off" /><button>Send</button></form>
+</div>
+
+<script>
+const TOKEN = "brewly-demo-token";
+let customer = "c_maya";
+let session = Math.random().toString(36).slice(2);
+const $ = (id) => document.getElementById(id);
+const PHASES = ["Escalating to Supfeel…", "Supfeel is reading Brewly's code…", "Checking your account…", "Working on a fix…", "Verifying…"];
+
+async function loadSub() {
+  const all = await (await fetch("/demo/customers")).json();
+  const c = all.find((x) => x.id === customer);
+  const s = c.subscription;
+  $("sub").innerHTML = `<span>Name</span><span>${c.name}</span><span>Plan</span><span>${s.plan}</span>
+    <span>Status</span><span><span class="pill ${s.status}">${s.status}</span></span>
+    <span>Next shipment</span><span>${s.next_ship_date}</span>${s.skipped.length ? `<span>Skipped</span><span>${s.skipped.join(", ")}</span>` : ""}`;
+}
+function note(id, ok, text) { const el = $(id); el.className = "msg " + (ok ? "ok" : "err"); el.textContent = text; }
+async function post(path, body) {
+  const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${TOKEN}` }, body: JSON.stringify(body || {}) });
+  const j = await r.json(); return { ok: r.ok, j };
+}
+$("pause").onclick = async () => { const { ok, j } = await post(`/api/customers/${customer}/subscription/pause`, { weeks: +$("weeks").value }); note("sub-msg", ok, ok ? `Paused until ${j.paused_until}` : j.detail); loadSub(); };
+$("skip").onclick = async () => { const { ok, j } = await post(`/api/customers/${customer}/subscription/skip`); note("sub-msg", ok, ok ? `Skipped. Next shipment ${j.next_ship_date}` : j.detail); loadSub(); };
+$("signup").onclick = async () => { const { ok, j } = await post("/api/signup", { name: $("su-name").value, email: $("su-email").value }); note("su-msg", ok, ok ? `Account created for ${j.email}` : j.detail); };
+document.querySelectorAll(".who button").forEach((b) => b.onclick = () => {
+  document.querySelectorAll(".who button").forEach((x) => x.classList.remove("on")); b.classList.add("on");
+  customer = b.dataset.c; session = Math.random().toString(36).slice(2); $("log").innerHTML = ""; greet(); loadSub();
+});
+
+function bubble(kind, text, extra) {
+  const el = document.createElement("div"); el.className = "b " + kind;
+  if (kind === "supfeel") {
+    const tag = document.createElement("div"); tag.className = "tag";
+    tag.innerHTML = `⚡ Supfeel ${extra?.ticket_id ? `<a href="${extra.trace_url || "#"}" target="_blank">${extra.ticket_id}</a>` : ""} <span style="color:#7a6656;font-weight:500">${extra?.status ? "· " + extra.status.replace(/_/g, " ") : ""}</span>`;
+    el.appendChild(tag);
+  }
+  const body = document.createElement("div"); body.textContent = text; el.appendChild(body);
+  if (extra?.engineering?.root_cause) {
+    const e = document.createElement("div"); e.className = "eng";
+    e.textContent = `Engineering: ${extra.engineering.root_cause}${extra.engineering.pr_url ? " · PR opened" : ""}`; el.appendChild(e);
+  }
+  if (extra?.question) {
+    const yn = document.createElement("div"); yn.className = "yn";
+    for (const [label, msg] of [["Yes, go ahead", "yes"], ["No", "no"]]) {
+      const btn = document.createElement("button"); btn.textContent = label; btn.onclick = () => { yn.remove(); send(msg); }; yn.appendChild(btn);
+    }
+    el.appendChild(yn);
+  }
+  $("log").appendChild(el); $("log").scrollTop = 1e9;
+}
+function greet() { bubble("bot", "Hi! I'm Brewly Bot. I can help with plans and shipping, and I'll bring in our support team for anything else."); }
+async function send(text) {
+  if (!text.trim()) return;
+  bubble("me", text); $("text").value = "";
+  const t = document.createElement("div"); t.className = "typing"; t.innerHTML = '<span class="dot"></span><span id="phase">Brewly Bot is typing…</span>';
+  $("log").appendChild(t); $("log").scrollTop = 1e9;
+  let i = 0; const timer = setTimeout(function tick() { const p = document.getElementById("phase"); if (p) p.textContent = PHASES[Math.min(i++, PHASES.length - 1)]; window._t = setTimeout(tick, 2600); }, 700);
+  try {
+    const r = await fetch("/bot/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: session, customer_id: customer, message: text }) });
+    const j = await r.json();
+    bubble(j.from === "supfeel" ? "supfeel" : "bot", j.text, j);
+  } catch (e) { bubble("bot", "Sorry, something went wrong."); }
+  finally { clearTimeout(timer); clearTimeout(window._t); t.remove(); loadSub(); }
+}
+$("send").onsubmit = (e) => { e.preventDefault(); send($("text").value); };
+$("chips").querySelectorAll("button").forEach((b) => b.onclick = () => send(b.textContent));
+$("chat-btn").onclick = () => { $("chat").classList.add("open"); $("chat-btn").style.display = "none"; if (!$("log").children.length) greet(); };
+$("close").onclick = () => { $("chat").classList.remove("open"); $("chat-btn").style.display = ""; };
+loadSub();
+</script>
+</body>
+</html>
