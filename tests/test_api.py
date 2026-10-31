@@ -31,6 +31,12 @@ def test_pause_four_weeks():
     assert r.status_code == 200 and r.json()["status"] == "paused"
 
 
+def test_pause_eight_weeks_allowed_nine_rejected():
+    url = "/api/customers/c_maya/subscription/pause"
+    assert client.post(url, json={"weeks": 8}, headers=AUTH).status_code == 200
+    assert client.post(url, json={"weeks": 9}, headers=AUTH).status_code == 422
+
+
 def test_pause_needs_token():
     assert client.post("/api/customers/c_maya/subscription/pause", json={"weeks": 2}).status_code == 401
 

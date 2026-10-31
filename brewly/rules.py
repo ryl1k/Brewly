@@ -24,7 +24,7 @@ def validate_signup(name: str, email: str) -> dict:
 
 def pause(sub: dict, weeks: int, today: date) -> dict:
     # Customers can pause for 1 to MAX_PAUSE_WEEKS weeks.
-    if not 1 <= weeks < MAX_PAUSE_WEEKS:
+    if not 1 <= weeks <= MAX_PAUSE_WEEKS:
         raise RuleError(f"You can pause for 1 to {MAX_PAUSE_WEEKS} weeks")
     until = today + timedelta(weeks=weeks)
     return {**sub, "status": "paused", "paused_until": until.isoformat(), "next_ship_date": until.isoformat()}
